@@ -1,0 +1,26 @@
+- name: Search for Next Available IP
+  hosts: all
+  connection: local
+  gather_facts: false
+  
+  vars:
+    nios_provider:
+      host: 192.168.1.190
+      username: admin
+      password: infoblox
+
+  tasks:
+    
+    - name: return next available IP address for network 192.168.10.0/24
+      ansible.builtin.set_fact:
+         ipaddr: "{{ lookup('community.general.nios_next_ip', '192.168.10.0/24', provider={'host': '192.168.1.190', 'username': 'admin', 'password': 'infoblox'}) }}"
+
+    - name: save the data
+      debug:
+        # msg: "provide the ip {{ ipaddr }}"
+         var: ipaddr
+
+    - name: Save information of next available IP for subsequent workflow
+      set_stats:
+        data:
+          ipv4_address: "{{ ipaddr }}"
